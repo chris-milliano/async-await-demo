@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Async/Await Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        .box {
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0 auto;
+            overflow-y: auto;
+        }
+
+        #body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: helvetica;
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body id="body" class="box">
+
+    <div class="box">
+        <h1>Demo Callbacks Crazy</h1>
+    </div>
+
+    <script>
+        ( () => { setupPage() })();
+
+        function setupPage() {
+
+            console.log('start setup');
+
+
+            let getA = httpGetAsync('/color/00ff00/3', readColor);
+            let getB = httpGetAsync('/color/0000ff/6', readColor);
+            console.log('requests fired', getA, getB);
+
+
+            setTimeout( () => {
+                updateBkgdColor('#ff0000');
+                console.log('manually change color after 1 sec until the first fetch is resolved', getA, getB);
+            }, 1000);
+        }
+
+
+        function httpGetAsync (url, callback) {
+            const xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                    callback(xmlHttp.responseText);
+                }
+            }
+            xmlHttp.open("GET", url, true);
+            xmlHttp.send(null);
+        }
+
+        function readColor(httpRes) {
+            console.log(`readColor(${httpRes})`);
+            let res = JSON.parse(httpRes);
+            updateBkgdColor(res.color);
+        }
+
+        function updateBkgdColor (hex) {
+            console.log(`updateBkgdColor(${hex})`);
+            document.getElementById('body').style.backgroundColor = hex;
+        }
+    </script>
+
+</body>
+</html>
